@@ -15,6 +15,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request as RequestType } from 'express';
+import { LoginPresenter } from '../../presenters/login.presenter';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,6 @@ export class AuthController {
 
     const response = await this.authService.login(user);
 
-    return response;
+    return LoginPresenter.toHTTP(response);
   }
 }
