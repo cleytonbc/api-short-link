@@ -44,6 +44,13 @@ export class PrismaUserRepository implements IUserRepository {
     return users.map((u) => PrismaUserMapper.toDomain(u));
   }
 
+  async updateLastLogin(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { lastLoginAt: new Date() },
+    });
+  }
+
   async create(user: User): Promise<User> {
     const data = PrismaUserMapper.toPrisma(user);
     const createdUser = await this.prisma.user.create({

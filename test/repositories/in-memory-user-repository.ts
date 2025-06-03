@@ -37,6 +37,16 @@ export class InMemoryUserRepository implements IUserRepository {
     return Promise.resolve([...this.items]);
   }
 
+  async updateLastLogin(userId: string): Promise<void> {
+    const itemIndex = await Promise.resolve(
+      this.items.findIndex((item) => item.id.toValue() === userId),
+    );
+
+    if (itemIndex >= 0) {
+      this.items[itemIndex].lastLoginAt = new Date();
+    }
+  }
+
   async create(user: User): Promise<User> {
     this.items.push(user);
     return Promise.resolve(user);
