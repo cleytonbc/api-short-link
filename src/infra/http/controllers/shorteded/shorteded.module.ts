@@ -8,20 +8,24 @@ import { UpdateShortenedUrlController } from './updated-shortened-url.controller
 import { UpdateShortenedUrlUseCase } from '@/domain/shortener/use-cases/update-shortened-url';
 import { DeleteShortenedUrlController } from './delete-shortened-url.controller';
 import { DeleteShortenedUrlUseCase } from '@/domain/shortener/use-cases/delete-shortened-url';
+import { FetchShortenedUrlByIdController } from './fetch-shortened-user-by-user.controller';
+import { FetchShortenedUrlByIdUseCase } from '@/domain/shortener/use-cases/fetch-shortened-url-by-user';
 
 @Module({
   controllers: [
+    FetchShortenedUrlByIdController,
     CreateShortenedUrlController,
     GetUrlController,
     UpdateShortenedUrlController,
-    DeleteShortenedUrlController
+    DeleteShortenedUrlController,
   ],
   providers: [
+    FetchShortenedUrlByIdUseCase,
     CreateShortenedUrlUseCase,
     GenerateUniqueShortCodeService,
     GetShortenedUrlUseCase,
     UpdateShortenedUrlUseCase,
-    DeleteShortenedUrlUseCase
+    DeleteShortenedUrlUseCase,
   ],
 })
 export class ShortedModule {}
