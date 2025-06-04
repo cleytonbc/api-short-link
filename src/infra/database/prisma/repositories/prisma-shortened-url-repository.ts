@@ -45,11 +45,11 @@ export class PrismaShortenedRepository implements IShortenedUrlRepository {
     return PrismaShortenedUrlMapper.toDomain(shortened);
   }
 
-   async findByUserId(userId: string): Promise<ShortenedUrl[]> {
+  async findByUserId(userId: string): Promise<ShortenedUrl[]> {
     const shortenedUrls = await this.prisma.shortenedUrl.findMany({
       where: {
         userId,
-        deletedAt: null
+        deletedAt: null,
       },
     });
 
@@ -61,8 +61,8 @@ export class PrismaShortenedRepository implements IShortenedUrlRepository {
   async findAll(): Promise<ShortenedUrl[]> {
     const shortenedUrls = await this.prisma.shortenedUrl.findMany({
       where: {
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     return shortenedUrls.map((shortened) =>

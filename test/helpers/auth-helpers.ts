@@ -25,8 +25,11 @@ export async function createAndAuthenticateUser(
     .post('/auth/login')
     .send({ email, password });
 
-  const token: string = response.body?.access_token as string;
-  const id: string = response.body?.user?.id as string;
+  type IBody = { access_token: string; user: { id: string } };
+  const body = response.body as IBody;
+
+  const token: string = body?.access_token;
+  const id: string = body?.user?.id;
 
   if (typeof token !== 'string') {
     throw new Error('Token not returned');

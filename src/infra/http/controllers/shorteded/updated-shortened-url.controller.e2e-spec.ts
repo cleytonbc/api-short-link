@@ -13,7 +13,7 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 describe('Atualizar url encurtada (E2E)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
-  let shortenedUrlFactory: ShortenedUrlFactory
+  let shortenedUrlFactory: ShortenedUrlFactory;
   let authToken: string;
   let userId: string;
 
@@ -22,7 +22,7 @@ describe('Atualizar url encurtada (E2E)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ShortenedUrlFactory]
+      providers: [ShortenedUrlFactory],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -34,7 +34,6 @@ describe('Atualizar url encurtada (E2E)', () => {
     const { token, id } = await createAndAuthenticateUser(app, prismaService);
     authToken = token;
     userId = id;
-
   });
 
   afterAll(async () => {
@@ -42,22 +41,21 @@ describe('Atualizar url encurtada (E2E)', () => {
   });
 
   test('[GET] /shorten/:id', async () => {
-
     const shortenedUrl = await shortenedUrlFactory.makePrismaUser({
       originalUrl: 'https://www.google.com',
       userId: new UniqueEntityID(userId),
-    })
+    });
 
-    const id = shortenedUrl.id.toValue()
+    const id = shortenedUrl.id.toValue();
     const response = await request(app.getHttpServer() as Server)
-    .put(`/shorten/${id}`)
-    .set('Authorization', `Bearer ${authToken}`)
-    .send({
-      url: 'https://www.bind.com.br'
-    })
-    .expect(200);
-    
-    const body = response.body as shortenedUrlResponse
+      .put(`/shorten/${id}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        url: 'https://www.bind.com.br',
+      })
+      .expect(200);
+
+    const body = response.body as shortenedUrlResponse;
 
     expect(body.originalUrl).toBe('https://www.bind.com.br');
 
@@ -66,6 +64,5 @@ describe('Atualizar url encurtada (E2E)', () => {
     });
 
     expect(updated?.originalUrl).toBe('https://www.bind.com.br');
-
   }, 60000);
 });

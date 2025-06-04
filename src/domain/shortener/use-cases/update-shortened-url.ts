@@ -9,16 +9,16 @@ export interface UpdateShortenedUrlRequest {
   userId: string;
 }
 
-
 @Injectable()
 export class UpdateShortenedUrlUseCase {
-  constructor(
-    private shortenedUrlRepository: IShortenedUrlRepository,
-  ) {}
+  constructor(private shortenedUrlRepository: IShortenedUrlRepository) {}
 
-  async execute({id, originalUrl, userId}: UpdateShortenedUrlRequest): Promise<ShortenedUrl> {
-    const shortenedUrlExist =
-      await this.shortenedUrlRepository.findById(id);
+  async execute({
+    id,
+    originalUrl,
+    userId,
+  }: UpdateShortenedUrlRequest): Promise<ShortenedUrl> {
+    const shortenedUrlExist = await this.shortenedUrlRepository.findById(id);
 
     if (!shortenedUrlExist || shortenedUrlExist.userId?.toValue() !== userId) {
       throw new UrlNotFoundError();
@@ -29,6 +29,6 @@ export class UpdateShortenedUrlUseCase {
 
     await this.shortenedUrlRepository.save(shortenedUrlExist);
 
-    return shortenedUrlExist
+    return shortenedUrlExist;
   }
 }

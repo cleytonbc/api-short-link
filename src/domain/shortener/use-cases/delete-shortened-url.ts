@@ -9,11 +9,9 @@ export interface DeleteShortenedUrlRequest {
 
 @Injectable()
 export class DeleteShortenedUrlUseCase {
-  constructor(
-    private shortenedUrlRepository: IShortenedUrlRepository,
-  ) {}
+  constructor(private shortenedUrlRepository: IShortenedUrlRepository) {}
 
-  async execute({id, userId}: DeleteShortenedUrlRequest): Promise<void> {
+  async execute({ id, userId }: DeleteShortenedUrlRequest): Promise<void> {
     const shortenedUrlExist = await this.shortenedUrlRepository.findById(id);
 
     if (!shortenedUrlExist || shortenedUrlExist.userId?.toValue() !== userId) {

@@ -4,9 +4,7 @@ import { UrlNotFoundError } from '../errors/url-not-found-error';
 
 @Injectable()
 export class GetShortenedUrlUseCase {
-  constructor(
-    private shortenedUrlRepository: IShortenedUrlRepository,
-  ) {}
+  constructor(private shortenedUrlRepository: IShortenedUrlRepository) {}
 
   async execute(code: string): Promise<string> {
     const shortenedUrlExist =

@@ -10,7 +10,7 @@ type Override = Partial<{
   originalUrl: string;
   userId?: UniqueEntityID;
   clickCount: number;
-  updatedAt?: Date
+  updatedAt?: Date;
 }>;
 
 export function makeShortenedUrl(
@@ -23,7 +23,7 @@ export function makeShortenedUrl(
       originalUrl: override.originalUrl ?? faker.internet.url(),
       clickCount: override.clickCount ?? 0,
       userId: override.userId ?? undefined,
-      updatedAt: override.updatedAt ?? new Date()
+      updatedAt: override.updatedAt ?? new Date(),
     },
     id,
   );

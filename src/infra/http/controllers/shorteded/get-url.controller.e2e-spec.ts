@@ -10,12 +10,12 @@ import { ShortenedUrlFactory } from '@test/factories/make-shortened-url';
 describe('Acessar url encurtada (E2E)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
-  let shortenedUrlFactory: ShortenedUrlFactory
+  let shortenedUrlFactory: ShortenedUrlFactory;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ShortenedUrlFactory]
+      providers: [ShortenedUrlFactory],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -23,7 +23,6 @@ describe('Acessar url encurtada (E2E)', () => {
     shortenedUrlFactory = moduleRef.get(ShortenedUrlFactory);
 
     await app.init();
-
   });
 
   afterAll(async () => {
@@ -31,16 +30,15 @@ describe('Acessar url encurtada (E2E)', () => {
   });
 
   test('[GET] /:code', async () => {
-
-    const shortenedUrl = await shortenedUrlFactory.makePrismaUser()
+    const shortenedUrl = await shortenedUrlFactory.makePrismaUser();
 
     expect(shortenedUrl.clickCount).toBe(0);
 
-    const code = shortenedUrl.shortCode
+    const code = shortenedUrl.shortCode;
     const response = await request(app.getHttpServer() as Server)
-    .get(`/${code}`)
-    .expect(302);
-    
+      .get(`/${code}`)
+      .expect(302);
+
     expect(response.headers.location).toBe(shortenedUrl.originalUrl);
 
     const afterClick = await prismaService.shortenedUrl.findUnique({
@@ -48,8 +46,5 @@ describe('Acessar url encurtada (E2E)', () => {
     });
 
     expect(afterClick?.clickCount).toBe(1);
-
   }, 60000);
-
-
 });

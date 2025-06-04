@@ -13,16 +13,14 @@ export class OptionalAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(
-    err: any,
+    err: { message?: string },
     user: { id: string; email: string; name: string } | null,
-    info: any,
-    context: any,
-    status: any,
+    info: { message?: string },
   ): any {
     if (info instanceof Error && info.message === 'No auth token') {
       return null;
     } else if (info instanceof Error || err) {
-      const message = (info?.message as string) ?? (err?.message as string);
+      const message = info?.message ?? err?.message;
       throw new HttpException(
         message ?? 'Invalid or expired token.',
         HttpStatus.UNAUTHORIZED,

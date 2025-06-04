@@ -12,14 +12,14 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id';
 describe('Excluir url encurtada (E2E)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
-  let shortenedUrlFactory: ShortenedUrlFactory
+  let shortenedUrlFactory: ShortenedUrlFactory;
   let authToken: string;
   let userId: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [ShortenedUrlFactory]
+      providers: [ShortenedUrlFactory],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -31,7 +31,6 @@ describe('Excluir url encurtada (E2E)', () => {
     const { token, id } = await createAndAuthenticateUser(app, prismaService);
     authToken = token;
     userId = id;
-
   });
 
   afterAll(async () => {
@@ -39,23 +38,21 @@ describe('Excluir url encurtada (E2E)', () => {
   });
 
   test('[DELETE] /shorten/:id', async () => {
-
     const shortenedUrl = await shortenedUrlFactory.makePrismaUser({
       originalUrl: 'https://www.google.com',
       userId: new UniqueEntityID(userId),
-    })
+    });
 
-    const id = shortenedUrl.id.toValue()
+    const id = shortenedUrl.id.toValue();
     await request(app.getHttpServer() as Server)
-    .delete(`/shorten/${id}`)
-    .set('Authorization', `Bearer ${authToken}`)
-    .expect(204);
+      .delete(`/shorten/${id}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(204);
 
     const deletedUrl = await prismaService.shortenedUrl.findUnique({
       where: { id: shortenedUrl.id.toString() },
     });
 
     expect(deletedUrl?.deletedAt).toBeDefined();
-
   }, 60000);
 });

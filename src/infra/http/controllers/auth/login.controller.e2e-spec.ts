@@ -1,3 +1,4 @@
+import type { Server } from 'http';
 import { describe, expect } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
@@ -33,7 +34,7 @@ describe('Get user by ID (integration)', () => {
   test('[POST] /login', async () => {
     const user = await userFactory.makePrismaUser({ password: 'test123' });
 
-    const response = await request(app.getHttpServer())
+    const response = await request(app.getHttpServer() as Server)
       .post('/auth/login')
       .send({
         password: `test123`,

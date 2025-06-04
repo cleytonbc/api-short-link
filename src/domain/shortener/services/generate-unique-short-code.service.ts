@@ -21,8 +21,10 @@ export class GenerateUniqueShortCodeService {
       }
 
       shortCode = generateShortCode();
-      shortCodeExist =
-        await this.shortenedUrlRepository.findByShortCode(shortCode, true);
+      shortCodeExist = await this.shortenedUrlRepository.findByShortCode(
+        shortCode,
+        true,
+      );
       attempts++;
     } while (shortCodeExist);
 

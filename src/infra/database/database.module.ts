@@ -18,13 +18,7 @@ import { IShortenedUrlRepository } from '@/domain/shortener/repositories/shorten
       provide: IShortenedUrlRepository,
       useClass: PrismaShortenedRepository,
     },
-
   ],
-  exports: [
-    PrismaService,
-    IUserRepository,
-    IShortenedUrlRepository,
-
-  ],
+  exports: [PrismaService, IUserRepository, IShortenedUrlRepository],
 })
 export class DatabaseModule {}
