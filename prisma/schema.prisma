@@ -19,4 +19,22 @@ model User {
   deletedAt   DateTime? @map("deleted_at")
 
   @@map("users")
+  ShortenedUrl ShortenedUrl[]
+}
+
+model ShortenedUrl {
+  id          String    @id @default(uuid())
+  shortCode   String    @unique @map("short_code") @db.VarChar(6)
+  originalUrl String    @map("original_url")
+  userId      String?   @map("user_id")
+  clickCount  Int       @default(0) @map("click_count")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  user   User?      @relation(fields: [userId], references: [id])
+
+  @@index([shortCode], name: "idx_shortened_urls_short_code")
+  @@index([userId], name: "idx_shortened_urls_user_id")
+  @@map("shortened_urls")
 }
