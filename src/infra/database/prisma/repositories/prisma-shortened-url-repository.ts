@@ -4,6 +4,8 @@ import { IShortenedUrlRepository } from '@/domain/shortener/repositories/shorten
 import { ShortenedUrl } from '@/domain/shortener/entities/shortened-url';
 import { PrismaShortenedUrlMapper } from '../mappers/prisma-shortened-url-mapper';
 import { Prisma } from '@generated/prisma';
+import { UrlClick } from '@/domain/shortener/entities/url-click';
+import { PrismaUrlClickMapper } from '../mappers/prisma-url-click-mapper';
 
 @Injectable()
 export class PrismaShortenedRepository implements IShortenedUrlRepository {
@@ -68,6 +70,35 @@ export class PrismaShortenedRepository implements IShortenedUrlRepository {
     return shortenedUrls.map((shortened) =>
       PrismaShortenedUrlMapper.toDomain(shortened),
     );
+  }
+
+  async incrementClickCountAndCreateUrlClick(
+    id: string,
+    urlClick: UrlClick,
+  ): Promise<ShortenedUrl | null> {
+    const shortened = await this.prisma.$transaction(async (tx) => {
+      const updatedUrl = await tx.shortenedUrl.update({
+        where: { id },
+        data: {
+          clickCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      const data = PrismaUrlClickMapper.toPrisma(urlClick);
+      await tx.urlClick.create({
+        data,
+      });
+
+      return updatedUrl;
+    });
+
+    if (!shortened) {
+      return null;
+    }
+
+    return PrismaShortenedUrlMapper.toDomain(shortened);
   }
 
   async create(shortenedUrl: ShortenedUrl): Promise<ShortenedUrl> {
