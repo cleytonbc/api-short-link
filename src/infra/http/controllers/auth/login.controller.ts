@@ -16,6 +16,10 @@ import {
 } from '@nestjs/common';
 import { Request as RequestType } from 'express';
 import { LoginPresenter } from '../../presenters/login.presenter';
+import { ApiOperation } from '@nestjs/swagger';
+import { SWAGGER_API_TAGS } from '@/infra/swagger/tags';
+import { ApiCreateEndpoint } from '@/infra/swagger/api-response-default.decorator';
+import { LoginResponseDto } from '../dtos/response/login-response-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,6 +28,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Efetuar login',
+    tags: [SWAGGER_API_TAGS.AUTH],
+  })
+  @ApiCreateEndpoint<LoginResponseDto>(LoginResponseDto)
   async login(
     @Body() loginDto: LoginDto,
     @Request() req: RequestType,
