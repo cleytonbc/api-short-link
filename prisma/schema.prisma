@@ -9,17 +9,17 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  name        String
-  password    String
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  lastLoginAt DateTime? @map("last_login_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id           String         @id @default(uuid())
+  email        String         @unique
+  name         String
+  password     String
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  lastLoginAt  DateTime?      @map("last_login_at")
+  deletedAt    DateTime?      @map("deleted_at")
+  ShortenedUrl ShortenedUrl[]
 
   @@map("users")
-  ShortenedUrl ShortenedUrl[]
 }
 
 model ShortenedUrl {
@@ -33,8 +33,20 @@ model ShortenedUrl {
   deletedAt   DateTime? @map("deleted_at")
 
   user   User?      @relation(fields: [userId], references: [id])
+  clicks UrlClick[]
 
   @@index([shortCode], name: "idx_shortened_urls_short_code")
   @@index([userId], name: "idx_shortened_urls_user_id")
   @@map("shortened_urls")
+}
+
+model UrlClick {
+  id             String   @id @default(uuid())
+  shortenedUrlId String   @map("shortened_url_id")
+  clickedAt      DateTime @default(now()) @map("clicked_at")
+
+  shortenedUrl ShortenedUrl @relation(fields: [shortenedUrlId], references: [id])
+
+  @@index([shortenedUrlId], name: "idx_url_clicks_shortened_url_id")
+  @@map("url_clicks")
 }
