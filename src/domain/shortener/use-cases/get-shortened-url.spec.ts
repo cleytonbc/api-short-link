@@ -2,13 +2,19 @@ import { GetShortenedUrlUseCase } from './get-shortened-url';
 import { InMemoryShortenedUrlRepository } from '@test/repositories/in-memory-shortened-url-repository';
 import { makeShortenedUrl } from '@test/factories/make-shortened-url';
 import { UrlNotFoundError } from '../errors/url-not-found-error';
+import { InMemoryUrlClickRepository } from '@test/repositories/in-memory-url-click-repository';
+import { IUrlClickRepository } from '../repositories/url-click-repository.interface';
 
 describe('GetShortenedUrlUseCase', () => {
   let shortenedUrlRepository: InMemoryShortenedUrlRepository;
   let getShortenedUrlUseCase: GetShortenedUrlUseCase;
+  let UrlClickRepository: IUrlClickRepository;
 
   beforeEach(() => {
-    shortenedUrlRepository = new InMemoryShortenedUrlRepository();
+    UrlClickRepository = new InMemoryUrlClickRepository();
+    shortenedUrlRepository = new InMemoryShortenedUrlRepository(
+      UrlClickRepository,
+    );
     getShortenedUrlUseCase = new GetShortenedUrlUseCase(shortenedUrlRepository);
   });
 
@@ -16,7 +22,9 @@ describe('GetShortenedUrlUseCase', () => {
     const shortenedUrl = makeShortenedUrl();
     await shortenedUrlRepository.create(shortenedUrl);
 
-    const result = await getShortenedUrlUseCase.execute(shortenedUrl.shortCode);
+    const result = await getShortenedUrlUseCase.execute({
+      code: shortenedUrl.shortCode,
+    });
 
     expect(result).toBe(shortenedUrl.originalUrl);
   });
@@ -25,7 +33,9 @@ describe('GetShortenedUrlUseCase', () => {
     const shortenedUrl = makeShortenedUrl();
     await shortenedUrlRepository.create(shortenedUrl);
 
-    const result = await getShortenedUrlUseCase.execute(shortenedUrl.shortCode);
+    const result = await getShortenedUrlUseCase.execute({
+      code: shortenedUrl.shortCode,
+    });
 
     expect(result).toBe(shortenedUrl.originalUrl);
 
@@ -35,7 +45,7 @@ describe('GetShortenedUrlUseCase', () => {
 
     expect(shortenedUrlUpdated1?.clickCount).toBe(1);
 
-    await getShortenedUrlUseCase.execute(shortenedUrl.shortCode);
+    await getShortenedUrlUseCase.execute({ code: shortenedUrl.shortCode });
 
     const shortenedUrlUpdated2 = await shortenedUrlRepository.findByShortCode(
       shortenedUrl.shortCode,
@@ -46,7 +56,29 @@ describe('GetShortenedUrlUseCase', () => {
 
   it('Deve retornar um erro quando a url não existir', async () => {
     await expect(
-      getShortenedUrlUseCase.execute('non-existent'),
+      getShortenedUrlUseCase.execute({ code: 'non-existent' }),
     ).rejects.toThrow(UrlNotFoundError);
+  });
+
+  it('Deve criar um registro de clique', async () => {
+    const shortenedUrl = makeShortenedUrl();
+    await shortenedUrlRepository.create(shortenedUrl);
+
+    const before = await UrlClickRepository.findByShortenedUrlId(
+      shortenedUrl.id.toValue(),
+    );
+
+    expect(before).toHaveLength(0);
+    const result = await getShortenedUrlUseCase.execute({
+      code: shortenedUrl.shortCode,
+    });
+
+    expect(result).toBe(shortenedUrl.originalUrl);
+
+    const after = await UrlClickRepository.findByShortenedUrlId(
+      shortenedUrl.id.toValue(),
+    );
+
+    expect(after).toHaveLength(1);
   });
 });

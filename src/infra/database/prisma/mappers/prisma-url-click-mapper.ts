@@ -8,6 +8,8 @@ export class PrismaUrlClickMapper {
       {
         shortenedUrlId: new UniqueEntityID(raw.shortenedUrlId),
         clickedAt: raw.clickedAt,
+        ipAddress: raw.ipAddress,
+        userAgent: raw.userAgent,
       },
       new UniqueEntityID(raw.id),
     );
@@ -18,6 +20,8 @@ export class PrismaUrlClickMapper {
       id: shortenedUrl.id.toString(),
       shortenedUrlId: shortenedUrl.shortenedUrlId?.toString(),
       clickedAt: shortenedUrl.clickedAt,
+      ipAddress: shortenedUrl.ipAddress,
+      userAgent: shortenedUrl.userAgent,
     };
   }
 }

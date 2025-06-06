@@ -9,6 +9,10 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { SWAGGER_API_TAGS } from '@/infra/swagger/tags';
+import {
+  ClientInfo,
+  IClientInfo,
+} from '../../decorators/client-info.decorator';
 
 @Controller('/:code')
 export class GetUrlController {
@@ -31,8 +35,16 @@ export class GetUrlController {
       'Será redirecionado automaticamente para a URL do link encurtado',
   })
   @ApiNotFoundResponse({ description: 'URL not found' })
-  async handle(@Param('code') code: string, @Res() res: Response) {
-    const result = await this.getShortenedUrlUseCase.execute(code);
+  async handle(
+    @Param('code') code: string,
+    @Res() res: Response,
+    @ClientInfo() { ipAddress, userAgent }: IClientInfo,
+  ) {
+    const result = await this.getShortenedUrlUseCase.execute({
+      code,
+      ipAddress,
+      userAgent,
+    });
 
     return res.redirect(result);
   }
