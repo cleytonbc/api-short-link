@@ -38,13 +38,7 @@ export class CreateShortenedUrlUseCase {
 
     await this.shortenedUrlRepository.create(shortenedUrl);
 
-    console.log('shortCode', shortCode);
-    console.log(
-      "his.envService.get('API_BASE_URL')",
-      this.envService.get('API_BASE_URL'),
-    );
     const url = `${this.envService.get('API_BASE_URL')}/${shortCode}`;
-    console.log('url', url);
 
     return url;
   }
