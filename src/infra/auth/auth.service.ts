@@ -22,7 +22,7 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<IValidateUserResponse | null> {
-    const user = await this.userRepository.findByEmail(email, true);
+    const user = await this.userRepository.findByEmail(email, false);
 
     if (!user || user.deletedAt) {
       return null;

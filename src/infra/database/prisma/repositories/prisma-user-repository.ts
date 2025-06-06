@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { IUserRepository } from '@/domain/users/repositories/user-repository.interface';
 import { User } from '@/domain/users/entities/user';
 import { PrismaUserMapper } from '../mappers/prisma-user-mapper';
+import { Prisma } from '@generated/prisma';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -22,12 +23,22 @@ export class PrismaUserRepository implements IUserRepository {
     return PrismaUserMapper.toDomain(user);
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(
+    email: string,
+    includeDeleted = false,
+  ): Promise<User | null> {
+    const whereClause: Prisma.UserWhereUniqueInput = {
+      email,
+    };
+
+    if (!includeDeleted) {
+      whereClause.deletedAt = null;
+    }
+
     const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: whereClause,
     });
+
     if (!user) {
       return null;
     }
