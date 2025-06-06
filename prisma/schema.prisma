@@ -44,6 +44,8 @@ model UrlClick {
   id             String   @id @default(uuid())
   shortenedUrlId String   @map("shortened_url_id")
   clickedAt      DateTime @default(now()) @map("clicked_at")
+  ipAddress      String?  @map("ip_address") @db.VarChar(45)
+  userAgent      String?  @map("user_agent") @db.Text
 
   shortenedUrl ShortenedUrl @relation(fields: [shortenedUrlId], references: [id])
 
