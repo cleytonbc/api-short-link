@@ -1,3 +1,9 @@
+#### 0.3.1 (06-06-2025)
+
+##### Corrigido
+
+*  Retornando apenas a URL encurtada incluindo domínio (variável API_BASE_URL)  ([b376a4e](https://github.com/cleytonbc/api-short-link/commit/b376a4e))
+
 #### 0.3.0 (06-06-2025)
 
 ##### Tarefas
