@@ -6,11 +6,10 @@ import {
   CurrentUser,
   ICurrentUser,
 } from '@/infra/auth/decorators/current-user.decorator';
-import { ShortenedUrlPresenter } from '../../presenters/shortened-url.presenter';
 import { SWAGGER_API_TAGS } from '@/infra/swagger/tags';
 import { ApiCreateEndpoint } from '@/infra/swagger/api-response-default.decorator';
-import { ShortenedUrlResponseDto } from '../dtos/response/shortened-url-response-dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { CreateShortenedUrlResponseDto } from '../dtos/response/create-shortened-url-response-dto';
 
 @UseGuards(OptionalAuthGuard)
 @Controller('/shorten')
@@ -25,7 +24,9 @@ export class CreateShortenedUrlController {
     description:
       'Cria uma nova URL encurtada, sendo que a autenticação é opcional, mas caso autenticado, registra a URL como sendo do usuário logadoCria uma nova URL encurtada. Se a requisição for autenticada, a URL será vinculada ao usuário logado; caso contrário, será registrada sem associação a um usuário.',
   })
-  @ApiCreateEndpoint<ShortenedUrlResponseDto>(ShortenedUrlResponseDto)
+  @ApiCreateEndpoint<CreateShortenedUrlResponseDto>(
+    CreateShortenedUrlResponseDto,
+  )
   async handle(
     @Body() body: CreateShortenedUrlRequesDto,
     @CurrentUser() user: ICurrentUser | null,
@@ -37,6 +38,6 @@ export class CreateShortenedUrlController {
       userId: user?.id,
     });
 
-    return ShortenedUrlPresenter.toHTTP(result);
+    return { url: result };
   }
 }

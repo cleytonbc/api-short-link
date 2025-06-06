@@ -4,23 +4,35 @@ import { GenerateUniqueShortCodeService } from '../services/generate-unique-shor
 import { InMemoryUserRepository } from '@test/repositories/in-memory-user-repository';
 import { makeUser } from '@test/factories/make-user';
 import { UserDoesNotExistError } from '../errors/user-not-found-error';
+import { Env } from '@/infra/env/env';
+import { EnvService } from '@/infra/env/env.service';
+import { vi } from 'vitest';
 
 describe('CreateShortenedUrlUseCase', () => {
   let shortenedUrlRepository: InMemoryShortenedUrlRepository;
   let createShortenedUrlUseCase: CreateShortenedUrlUseCase;
   let generateUniqueShortCodeService: GenerateUniqueShortCodeService;
   let userRepository: InMemoryUserRepository;
+  let envServiceMock: EnvService;
 
   beforeEach(() => {
     shortenedUrlRepository = new InMemoryShortenedUrlRepository();
     generateUniqueShortCodeService = new GenerateUniqueShortCodeService(
       shortenedUrlRepository,
     );
+
     userRepository = new InMemoryUserRepository();
+    envServiceMock = {
+      get: vi.fn().mockImplementation((key: keyof Env) => {
+        if (key === 'API_BASE_URL') return 'http://localhost:3000';
+        return '';
+      }),
+    } as unknown as EnvService;
     createShortenedUrlUseCase = new CreateShortenedUrlUseCase(
       shortenedUrlRepository,
       generateUniqueShortCodeService,
       userRepository,
+      envServiceMock,
     );
   });
 
@@ -29,10 +41,14 @@ describe('CreateShortenedUrlUseCase', () => {
       originalUrl: 'www.google.com',
     });
 
-    expect(result.shortCode).toBeDefined();
-    expect(result.shortCode).toHaveLength(6);
-    expect(result.originalUrl).toBe('www.google.com');
-    expect(result.userId).not.toBeDefined();
+    expect(typeof result).toBe('string');
+    const shortCode = result.split('/').pop();
+    const entity = shortenedUrlRepository.items.find(
+      (item) => item.shortCode === shortCode,
+    );
+    expect(entity).toBeDefined();
+    expect(entity?.originalUrl).toBe('www.google.com');
+    expect(entity?.userId).toBeUndefined();
   });
   it('Deve associar um usuário url criada, caso ele exista', async () => {
     const user = makeUser();
@@ -43,18 +59,26 @@ describe('CreateShortenedUrlUseCase', () => {
       userId: user.id.toString(),
     });
 
-    expect(result.shortCode).toBeDefined();
-    expect(result.originalUrl).toBeDefined();
-    expect(result.userId?.toString()).toBe(user.id.toString());
+    const shortCode = result.split('/').pop();
+    const entity = shortenedUrlRepository.items.find(
+      (item) => item.shortCode === shortCode,
+    );
+
+    expect(entity).toBeDefined();
+    expect(entity?.userId?.toString()).toBe(user.id.toString());
   });
   it("Deve iniciar com 0 o número de click's ", async () => {
     const result = await createShortenedUrlUseCase.execute({
       originalUrl: 'www.google.com',
     });
 
-    expect(result.shortCode).toBeDefined();
-    expect(result.originalUrl).toBeDefined();
-    expect(result.clickCount).toBe(0);
+    const shortCode = result.split('/').pop();
+    const entity = shortenedUrlRepository.items.find(
+      (item) => item.shortCode === shortCode,
+    );
+
+    expect(entity).toBeDefined();
+    expect(entity?.clickCount).toBe(0);
   });
   it('Não Deve criar um nome encurtador url caso o  usuário informado seja inválido ', async () => {
     await expect(

@@ -6,9 +6,6 @@ import request from 'supertest';
 import { PrismaService } from '@/infra/database/prisma/prisma.service';
 import { AppModule } from '@/app.module';
 import { createAndAuthenticateUser } from '@test/helpers/auth-helpers';
-import { ShortenedUrlPresenter } from '../../presenters/shortened-url.presenter';
-
-type shortenedUrlResponse = ReturnType<typeof ShortenedUrlPresenter.toHTTP>;
 
 describe('Criar url encurtada (E2E)', () => {
   let app: INestApplication;
@@ -45,13 +42,14 @@ describe('Criar url encurtada (E2E)', () => {
       .send(data)
       .expect(201);
 
-    const body = response.body as shortenedUrlResponse;
+    const body = response.body as { url: string };
 
-    expect(body).toHaveProperty('id');
-    expect(body.originalUrl).toBe(data.url);
+    expect(body.url).toBeDefined();
+
+    const shortCode = body.url.split('/').pop();
 
     const urlCreated = await prismaService.shortenedUrl.findUnique({
-      where: { id: body.id },
+      where: { shortCode },
     });
 
     expect(urlCreated).toBeTruthy();
@@ -69,13 +67,14 @@ describe('Criar url encurtada (E2E)', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .expect(201);
 
-    const body = response.body as shortenedUrlResponse;
+    const body = response.body as { url: string };
 
-    expect(body).toHaveProperty('id');
-    expect(body.originalUrl).toBe(data.url);
+    expect(body.url).toBeDefined();
+
+    const shortCode = body.url.split('/').pop();
 
     const urlCreated = await prismaService.shortenedUrl.findUnique({
-      where: { id: body.id },
+      where: { shortCode },
     });
 
     expect(urlCreated).toBeTruthy();

@@ -6,6 +6,7 @@ import { GenerateUniqueShortCodeService } from '../services/generate-unique-shor
 import { IUserRepository } from '@/domain/users/repositories/user-repository.interface';
 import { UserDoesNotExistError } from '../errors/user-not-found-error';
 import { UniqueEntityID } from '@/core/entities/unique-entity-id';
+import { EnvService } from '@/infra/env/env.service';
 
 @Injectable()
 export class CreateShortenedUrlUseCase {
@@ -13,12 +14,13 @@ export class CreateShortenedUrlUseCase {
     private shortenedUrlRepository: IShortenedUrlRepository,
     private generateUniqueShortCode: GenerateUniqueShortCodeService,
     private userRepository: IUserRepository,
+    private envService: EnvService,
   ) {}
 
   async execute({
     originalUrl,
     userId,
-  }: CreateShortenedUrlDTO): Promise<ShortenedUrl> {
+  }: CreateShortenedUrlDTO): Promise<string> {
     const shortCode = await this.generateUniqueShortCode.execute();
 
     if (userId) {
@@ -36,6 +38,14 @@ export class CreateShortenedUrlUseCase {
 
     await this.shortenedUrlRepository.create(shortenedUrl);
 
-    return shortenedUrl;
+    console.log('shortCode', shortCode);
+    console.log(
+      "his.envService.get('API_BASE_URL')",
+      this.envService.get('API_BASE_URL'),
+    );
+    const url = `${this.envService.get('API_BASE_URL')}/${shortCode}`;
+    console.log('url', url);
+
+    return url;
   }
 }
