@@ -9,7 +9,7 @@ export const envSchema = z
     API_BASE_URL: z.string(),
     APP_NAME: z.string().optional().default('api-short-ul'),
     OTEL_ENABLED: z.enum(['true', 'false']).default('false'),
-    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+    OTEL_EXPORTER_OTLP_ENDPOINT: z.string().optional(),
     OTEL_AUTH_HEADER_KEY: z.string().optional(),
     OTEL_AUTH_HEADER_VALUE: z.string().optional(),
   })
