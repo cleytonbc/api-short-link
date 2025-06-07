@@ -1,0 +1,9 @@
+echo "Running pre-push checks..."
+
+echo "Building project..."
+npm run build
+
+echo "Running e2e tests..."
+npm run test:e2e
+
+echo "Pre-push checks passed!"
