@@ -41,6 +41,17 @@ jobs:
             docker stop api-short-link || true
             docker rm api-short-link || true
 
+            echo Rodando migrate
+
+            docker run --rm --name migrate-short-link\
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              ${{ secrets.DOCKER_HOST }}/api-short-link:latest \
+              npx prisma migrate deploy
+
+            sleep 60
+
+            echo Rodando Deploy
+
             docker run -d --name api-short-link -p 3333:3000 \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
               -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
