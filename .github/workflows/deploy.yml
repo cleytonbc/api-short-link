@@ -44,14 +44,14 @@ jobs:
             docker run -d --name api-short-link -p 3333:3000 \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
               -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
-              -e JWT_EXPIRES_IN='${{ vars.JWT_EXPIRES_IN || "24h" }}' \
-              -e PORT='${{ vars.PORT || "3000" }}' \
+              -e JWT_EXPIRES_IN='${{ vars.JWT_EXPIRES_IN}}' \
+              -e PORT='${{ vars.PORT}}' \
               -e API_BASE_URL='${{ vars.API_BASE_URL }}' \
-              -e APP_NAME='${{ vars.APP_NAME || "api-short-url" }}' \
-              -e OTEL_ENABLED='${{ vars.OTEL_ENABLED || "false" }}' \
-              -e OTEL_EXPORTER_OTLP_ENDPOINT='${{ vars.OTEL_EXPORTER_OTLP_ENDPOINT || "" }}' \
-              -e OTEL_AUTH_HEADER_KEY='${{ vars.OTEL_AUTH_HEADER_KEY || "" }}' \
-              -e OTEL_AUTH_HEADER_VALUE='${{ vars.OTEL_AUTH_HEADER_VALUE || "" }}' \
-              -e TZ='${{ vars.TZ || "America/Sao_Paulo" }}' \
+              -e APP_NAME='${{ vars.APP_NAME}}' \
+              -e OTEL_ENABLED='${{ vars.OTEL_ENABLED}}' \
+              -e OTEL_EXPORTER_OTLP_ENDPOINT='${{ vars.OTEL_EXPORTER_OTLP_ENDPOINT}}' \
+              -e OTEL_AUTH_HEADER_KEY='${{ vars.OTEL_AUTH_HEADER_KEY}}' \
+              -e OTEL_AUTH_HEADER_VALUE='${{ vars.OTEL_AUTH_HEADER_VALUE}}' \
+              -e TZ='${{ vars.TZ }}' \
               ${{ secrets.DOCKER_HOST }}/api-short-link:latest
           EOF
