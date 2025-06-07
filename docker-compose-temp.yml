@@ -1,0 +1,61 @@
+# services:
+  # api-shortened:
+  #   container_name: api-nts
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: ${BUILD_TARGET:-dev}  
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '3333:3000'
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   command: pnpm run start:${BUILD_TARGET:-dev} 
+version: '3.8'
+
+services:
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "8081:16686"  # Jaeger UI
+      - "14268"
+      - "14250"
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "13133:13133" # health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # http gRPC receiver
+      - "55679:55679" # zpages extension
+      - "9464:9464"
+    depends_on:
+      - jaeger
+    links:
+      - jaeger
+  
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3033:3000"
+    depends_on:
+      - prometheus
