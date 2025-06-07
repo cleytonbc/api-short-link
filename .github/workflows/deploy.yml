@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Build Docker image
+        run: |
+          docker build --target production -t ${{ secrets.DOCKER_HOST }}/api-short-link:latest .
+
+      - name: Login to Docker Registry
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${{ secrets.DOCKER_HOST }} -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_HOST }}/api-short-link:latest
+
+      - name: Deploy on Remote Server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            docker login ${{ secrets.DOCKER_HOST }} -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull ${{ secrets.DOCKER_HOST }}/api-short-link:latest
+
+            docker stop api-short-link || true
+            docker rm api-short-link || true
+
+            echo Rodando migrate
+
+            docker run --rm --name migrate-short-link\
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              ${{ secrets.DOCKER_HOST }}/api-short-link:latest \
+              npx prisma migrate deploy
+
+            sleep 15
+
+            echo Rodando Deploy
+
+            docker run -d --name api-short-link -p 3333:3000 \
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
+              -e JWT_EXPIRES_IN='${{ vars.JWT_EXPIRES_IN}}' \
+              -e PORT='${{ vars.PORT}}' \
+              -e API_BASE_URL='${{ vars.API_BASE_URL }}' \
+              -e APP_NAME='${{ vars.APP_NAME}}' \
+              -e OTEL_ENABLED='${{ vars.OTEL_ENABLED}}' \
+              -e OTEL_EXPORTER_OTLP_ENDPOINT='${{ vars.OTEL_EXPORTER_OTLP_ENDPOINT}}' \
+              -e OTEL_AUTH_HEADER_KEY='${{ vars.OTEL_AUTH_HEADER_KEY}}' \
+              -e OTEL_AUTH_HEADER_VALUE='${{ vars.OTEL_AUTH_HEADER_VALUE}}' \
+              -e TZ='${{ vars.TZ }}' \
+              ${{ secrets.DOCKER_HOST }}/api-short-link:latest
+          EOF
