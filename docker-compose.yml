@@ -1,0 +1,34 @@
+services:
+  api-short-link:
+    build: 
+      context: .
+      target: production
+    container_name: api-short-link
+    ports:
+      - "3333:3000"
+    env_file:
+      - .env
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    command: ["sh", "-c", "npm run db:deploy && npm run start:prod"]
+
+  postgres_db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: short-link
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+volumes:
+  pgdata:
+
