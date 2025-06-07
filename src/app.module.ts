@@ -6,6 +6,7 @@ import { ZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 import { envSchema } from './infra/env/env';
 import { HttpModule } from './infra/http/http.module';
 import { DatabaseModule } from './infra/database/database.module';
+import { HttpMetricsInterceptor } from './infra/interceptor/http-metrics.interceptor';
 
 @Module({
   imports: [
@@ -26,6 +27,10 @@ import { DatabaseModule } from './infra/database/database.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ZodSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
     },
   ],
 })
