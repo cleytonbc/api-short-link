@@ -1,4 +1,4 @@
-name: Lint Check
+name: Lint Check and Running test
 
 on:
   push:
@@ -24,3 +24,6 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Run test
+        run: npm run test

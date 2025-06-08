@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -23,32 +24,46 @@ model User {
 }
 
 model ShortenedUrl {
-  id          String    @id @default(uuid())
-  shortCode   String    @unique @map("short_code") @db.VarChar(6)
-  originalUrl String    @map("original_url")
-  userId      String?   @map("user_id")
-  clickCount  Int       @default(0) @map("click_count")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id          String     @id @default(uuid())
+  shortCode   String     @unique @map("short_code") @db.VarChar(6)
+  originalUrl String     @map("original_url")
+  userId      String?    @map("user_id")
+  clickCount  Int        @default(0) @map("click_count")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  deletedAt   DateTime?  @map("deleted_at")
+  user        User?      @relation(fields: [userId], references: [id])
+  clicks      UrlClick[]
 
-  user   User?      @relation(fields: [userId], references: [id])
-  clicks UrlClick[]
-
-  @@index([shortCode], name: "idx_shortened_urls_short_code")
-  @@index([userId], name: "idx_shortened_urls_user_id")
+  @@index([shortCode], map: "idx_shortened_urls_short_code")
+  @@index([userId], map: "idx_shortened_urls_user_id")
   @@map("shortened_urls")
 }
 
 model UrlClick {
-  id             String   @id @default(uuid())
-  shortenedUrlId String   @map("shortened_url_id")
-  clickedAt      DateTime @default(now()) @map("clicked_at")
-  ipAddress      String?  @map("ip_address") @db.VarChar(45)
-  userAgent      String?  @map("user_agent") @db.Text
+  id             String       @id @default(uuid())
+  shortenedUrlId String       @map("shortened_url_id")
+  clickedAt      DateTime     @default(now()) @map("clicked_at")
+  ipAddress      String?      @map("ip_address") @db.VarChar(45)
+  userAgent      String?      @map("user_agent")
+  shortenedUrl   ShortenedUrl @relation(fields: [shortenedUrlId], references: [id])
 
-  shortenedUrl ShortenedUrl @relation(fields: [shortenedUrlId], references: [id])
-
-  @@index([shortenedUrlId], name: "idx_url_clicks_shortened_url_id")
+  @@index([shortenedUrlId], map: "idx_url_clicks_shortened_url_id")
   @@map("url_clicks")
+}
+
+view VwUrlClicksSummary {
+  id             String   @unique @map("id")
+  shortenedUrlId String   @map("shortened_url_id")
+  shortCode      String   @map("short_code") @db.VarChar(6)
+  originalUrl    String   @map("original_url")
+  createdAt      DateTime @map("created_at")
+  userId         String   @map("user_id")
+  userName       String   @map("user_name")
+  userEmail      String   @map("user_email")
+  clickDate      DateTime @map("click_date") @db.Date
+  clickHour      Int      @map("click_hour")
+  clickCount     BigInt   @map("click_count")
+
+  @@map("vw_url_clicks_summary")
 }

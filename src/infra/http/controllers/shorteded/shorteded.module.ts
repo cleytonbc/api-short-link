@@ -10,10 +10,13 @@ import { DeleteShortenedUrlController } from './delete-shortened-url.controller'
 import { DeleteShortenedUrlUseCase } from '@/domain/shortener/use-cases/delete-shortened-url';
 import { FetchShortenedUrlByIdController } from './fetch-shortened-user-by-user.controller';
 import { FetchShortenedUrlByIdUseCase } from '@/domain/shortener/use-cases/fetch-shortened-url-by-user';
+import { FetchUrlClicksSummaryByUserUseCase } from '@/domain/shortener/use-cases/fetch-url-click-summary';
+import { FetchUrlClicksSummaryController } from './fetch-url-click-summaries.controller';
 
 @Module({
   controllers: [
     FetchShortenedUrlByIdController,
+    FetchUrlClicksSummaryController,
     CreateShortenedUrlController,
     GetUrlController,
     UpdateShortenedUrlController,
@@ -21,6 +24,7 @@ import { FetchShortenedUrlByIdUseCase } from '@/domain/shortener/use-cases/fetch
   ],
   providers: [
     FetchShortenedUrlByIdUseCase,
+    FetchUrlClicksSummaryByUserUseCase,
     CreateShortenedUrlUseCase,
     GenerateUniqueShortCodeService,
     GetShortenedUrlUseCase,
