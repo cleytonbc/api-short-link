@@ -28,7 +28,7 @@ describe('Criar usuário (E2E)', () => {
     await app.close();
   });
 
-  test('[POST] /users', async () => {
+  test('[POST] /auth/register', async () => {
     const user = {
       name: 'José',
       email: 'jose@email.com',
@@ -36,7 +36,7 @@ describe('Criar usuário (E2E)', () => {
     };
 
     const response = await request(app.getHttpServer() as Server)
-      .post('/users')
+      .post('/auth/register')
       .send(user)
       .expect(201);
 

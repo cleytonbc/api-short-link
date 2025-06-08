@@ -7,15 +7,15 @@ import { SWAGGER_API_TAGS } from '@/infra/swagger/tags';
 import { ApiCreateEndpoint } from '@/infra/swagger/api-response-default.decorator';
 import { UserResponseDto } from '../dtos/response/user-response.dto';
 
-@Controller('/users')
+@Controller('/auth')
 export class CreateUserController {
   constructor(private createUserUseCase: CreateUserUseCase) {}
 
-  @Post()
+  @Post('/register')
   @HttpCode(201)
   @ApiOperation({
     summary: 'Criar um novo usuário',
-    tags: [SWAGGER_API_TAGS.USERS],
+    tags: [SWAGGER_API_TAGS.AUTH],
   })
   @ApiCreateEndpoint<UserResponseDto>(UserResponseDto)
   async handle(@Body() body: CreateUserRequesDto) {
