@@ -26,7 +26,6 @@ export const setupSwagger = (app: INestApplication) => {
   const publicEndpoints = [
     { path: '/{code}', method: 'get' },
     { path: '/auth/login', method: 'post' },
-    { path: '/shorten', method: 'post' },
     { path: '/health', method: 'get' },
   ];
 
