@@ -4,6 +4,10 @@ import { IUserRepository } from '@/domain/users/repositories/user-repository.int
 import { PrismaUserRepository } from './prisma/repositories/prisma-user-repository';
 import { PrismaShortenedRepository } from './prisma/repositories/prisma-shortened-url-repository';
 import { IShortenedUrlRepository } from '@/domain/shortener/repositories/shortened-url-repository.interface';
+import { IUrlClickRepository } from '@/domain/shortener/repositories/url-click-repository.interface';
+import { PrismaUrlClickRepository } from './prisma/repositories/prisma-url-click-repository';
+import { IVwUrlClicksSummaryRepository } from '@/domain/shortener/repositories/vw-url-click-summary.interface';
+import { PrismaVwUrlClicksSummaryRepository } from './prisma/repositories/prisma-vw-url-click-summary-repository';
 
 @Global()
 @Module({
@@ -18,7 +22,21 @@ import { IShortenedUrlRepository } from '@/domain/shortener/repositories/shorten
       provide: IShortenedUrlRepository,
       useClass: PrismaShortenedRepository,
     },
+    {
+      provide: IUrlClickRepository,
+      useClass: PrismaUrlClickRepository,
+    },
+    {
+      provide: IVwUrlClicksSummaryRepository,
+      useClass: PrismaVwUrlClicksSummaryRepository,
+    },
   ],
-  exports: [PrismaService, IUserRepository, IShortenedUrlRepository],
+  exports: [
+    PrismaService,
+    IUserRepository,
+    IShortenedUrlRepository,
+    IVwUrlClicksSummaryRepository,
+    IUrlClickRepository,
+  ],
 })
 export class DatabaseModule {}
