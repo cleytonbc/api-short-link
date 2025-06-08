@@ -4,4 +4,5 @@ export const SWAGGER_API_TAGS = {
   AUTH: 'Auth',
   LINK: 'Links',
   ANALYTICS: 'Analytics',
+  HEALTH: 'Health',
 };
