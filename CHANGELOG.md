@@ -1,3 +1,19 @@
+#### 0.5.0 (08-06-2025)
+
+##### Novas funcionalidades
+*  Alterado endpoint de criação de usuário de /users para  /auth/register ([f967bcf](https://github.com/cleytonbc/api-short-link/commit/f967bcf))
+*  Implementado rate limit para evitar abusos e ataques ([956828c](https://github.com/cleytonbc/api-short-link/commit/956828c))
+*  Implementado health check na api ([1fcabe3](https://github.com/cleytonbc/api-short-link/commit/1fcabe3))
+*  Implementado endpoint para mostrar resumo dos cliques das urls criada pelo usuário ([e7e9665](https://github.com/cleytonbc/api-short-link/commit/e7e9665))
+
+
+##### Tarefas
+
+*  Melhorado mensagem de erro e descrição no swagger ao criar uma url ([dbdedc4](https://github.com/cleytonbc/api-short-link/commit/dbdedc4))
+*  Adicionado para executar testes automatizado junto com lint no github Actions ([2e18a2d](https://github.com/cleytonbc/api-short-link/commit/2e18a2d))
+*  Garantindo que a variável port seja validada ([1a72e7a](https://github.com/cleytonbc/api-short-link/commit/1a72e7a))
+*  Melhorado o tratamento de erro ([a1060f7](https://github.com/cleytonbc/api-short-link/commit/a1060f7))
+
 #### 0.4.0 (07-06-2025)
 
 ##### Novas funcionalidades
